@@ -1,0 +1,756 @@
+1
+# DFS using manual input
+graph = {}
+n = int(input("Enter number of nodes: "))
+for i in range(n):
+    node = input("Enter node: ")
+    neighbour = input("Enter neighbours separated by space: ").split()
+    graph[node] = neighbour
+visited = set()
+
+def dfs(node):
+    if node not in visited:
+        print(node, end=" ")
+        visited.add(node)
+        for neighbour in graph[node]:
+            dfs(neighbour)
+
+start = input("\nEnter starting node: ")
+print("\nDFS Traversal:")
+dfs(start)
+"""
+Enter number of nodes:
+6
+Enter node:
+A
+Enter neighbours separated by space:
+B C
+Enter starting node:
+A
+"""
+
+
+
+
+
+
+
+
+
+
+2
+# BFS using manual input
+graph = {}
+n = int(input("Enter number of nodes: "))
+for i in range(n):
+    node = input("Enter node: ")
+    neighbours = input("Enter neighbours separated by space: ").split()
+    graph[node] = neighbours
+visited = []
+queue = []
+
+def bfs(start):
+    visited.append(start)
+    queue.append(start)
+    while queue:
+        node = queue.pop(0)
+        print(node, end=" ")
+        for neighbour in graph[node]:
+            if neighbour not in visited:
+                visited.append(neighbour)
+                queue.append(neighbour)
+start = input("\nEnter starting node: ")
+print("\nBFS Traversal:")
+bfs(start)
+
+
+
+
+
+
+
+
+
+
+
+3.
+import heapq
+N = 4
+# heuristic function: count attacking queen pairs
+def heuristic(state):
+    h = 0
+    for i in range(len(state)):
+        for j in range(i+1, len(state)):
+            if state[i] == state[j] or abs(state[i] - state[j]) == abs(i - j):
+                h += 1
+    return h
+def a_star():
+    # priority queue
+    pq = []
+    heapq.heappush(pq, (0, []))  # (f(n), state)
+    while pq:
+        f, state = heapq.heappop(pq)
+        row = len(state)
+        # goal condition
+        if row == N and heuristic(state) == 0:
+            return state
+        if row < N:
+            for col in range(N):
+                new_state = state + [col]
+                g = len(new_state)
+                h = heuristic(new_state)
+                f = g + h
+                heapq.heappush(pq, (f, new_state))
+solution = a_star()
+print("Solution (column positions):", solution)
+
+# Print board
+for r in range(N):
+    row = ["Q" if solution[r] == c else "." for c in range(N)]
+    print(" ".join(row))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.
+import heapq
+
+# Goal state
+goal = [[1,2,3],
+        [4,5,6],
+        [7,8,0]]
+# Heuristic: Manhattan Distance
+def heuristic(state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            value = state[i][j]
+            if value != 0:
+                goal_x = (value-1)//3
+                goal_y = (value-1)%3
+                distance += abs(i-goal_x) + abs(j-goal_y)
+    return distance
+
+def find_blank(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, 
+
+def get_neighbors(state):
+    neighbors = []
+    x, y = find_blank(state)
+    moves = [(1,0),(-1,0),(0,1),(0,-1)]
+    for dx, dy in moves:
+        nx, ny = x+dx, y+dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            neighbors.append(new_state)
+    return neighbors
+
+def a_star(start):
+    pq = []
+    heapq.heappush(pq, (heuristic(start), start, 0))
+    visited = set()
+    while pq:
+        f, state, g = heapq.heappop(pq)
+        if state == goal:
+            return state
+        visited.add(str(state))
+        for neighbor in get_neighbors(state):
+            if str(neighbor) not in visited:
+                new_g = g + 1
+                new_f = new_g + heuristic(neighbor)
+                heapq.heappush(pq, (new_f, neighbor, new_g))
+
+# User input
+print("Enter the initial 3x3 puzzle (use 0 for blank):")
+start = []
+for i in range(3):
+    row = list(map(int, input().split()))
+    start.append(row)
+solution = a_star(start)
+if solution is None:
+    print("No solution found")
+else:
+    print("Goal State Reached:")
+    for row in solution:
+        print(row)
+#1 2 3
+#4 0 6
+#7 5 8
+
+
+
+
+
+
+
+
+
+
+
+
+5.
+import sys
+# --------- Selection Sort ---------
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_index = i
+        for j in range(i+1, n):
+            if arr[j] < arr[min_index]:
+                min_index = j
+        arr[i], arr[min_index] = arr[min_index], arr[i]
+    return arr
+# --------- Minimum Spanning Tree (Prim's) ---------
+def prim_mst(graph, n):
+    selected = [False] * n
+    selected[0] = True
+    edges = 0
+    print("\nEdges in Minimum Spanning Tree:")
+    while edges < n - 1:
+        minimum = sys.maxsize
+        x = 0
+        y = 0
+        for i in range(n):
+            if selected[i]:
+                for j in range(n):
+                    if not selected[j] and graph[i][j]:
+                        if minimum > graph[i][j]:
+                            minimum = graph[i][j]
+                            x = i
+                            y = j
+        print(x, "-", y, ":", graph[x][y])
+        selected[y] = True
+        edges += 1
+
+# --------- Selection Sort Input ---------
+arr = list(map(int, input("Enter numbers for Selection Sort: ").split()))
+sorted_arr = selection_sort(arr)
+print("Sorted array:", sorted_arr)
+# --------- MST Input ---------
+n = int(input("\nEnter number of vertices for MST: "))
+graph = []
+print("Enter adjacency matrix:")
+for i in range(n):
+    row = list(map(int, input().split()))
+    graph.append(row)
+prim_mst(graph, n)
+
+'''0 2 0 6 0
+2 0 3 8 5
+0 3 0 0 7
+6 8 0 0 9
+0 5 7 9 0
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+6
+# --------- Dijkstra Algorithm ---------
+graph = {}
+n = int(input("Enter number of vertices: "))
+for i in range(n):
+    node = input("Enter vertex name: ")
+    neighbours = {}
+    m = int(input("Enter number of neighbours: "))
+    for j in range(m):
+        neighbour = input("Enter neighbour: ")
+        weight = int(input("Enter weight: "))
+        neighbours[neighbour] = weight
+    graph[node] = neighbours
+
+start = input("Enter starting vertex: ")
+distance = {}
+for node in graph:
+    distance[node] = 999
+distance[start] = 0
+visited = []
+while len(visited) < len(graph):
+    min_node = None
+    for node in graph:
+        if node not in visited:
+            if min_node is None or distance[node] < distance[min_node]:
+                min_node = node
+    visited.append(min_node)
+
+    for neighbour in graph[min_node]:
+        new_distance = distance[min_node] + graph[min_node][neighbour]
+        if new_distance < distance[neighbour]:
+            distance[neighbour] = new_distance
+print("\nShortest Distances:")
+for node in distance:
+    print(node, "=", distance[node])
+
+# --------- Job Scheduling ---------
+n = int(input("\nEnter number of jobs: "))
+jobs = []
+for i in range(n):
+    job = input("Enter Job ID: ")
+    profit = int(input("Enter Profit: "))
+    jobs.append((job, profit))
+jobs.sort(key=lambda x: x[1], reverse=True)
+print("\nSelected Jobs:")
+total_profit = 0
+for job in jobs:
+    print(job[0])
+    total_profit += job[1]
+print("Total Profit =", total_profit)
+
+'''Enter number of vertices: 4
+Enter vertex name: A
+Enter number of neighbours: 2
+Enter neighbour: B
+Enter weight: 1
+Enter neighbour: C
+Enter weight: 4
+Enter vertex name: B,2,C,2,D,5
+C,1,D,1
+ D,0
+STARTING: A
+Enter number of jobs: 3
+Enter Job ID: J1
+Enter Profit: 100
+J2,50
+ J3,70'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.
+import heapq
+#prims
+def prim(graph, start):
+    visited = set()
+    min_heap = [(0, start, None)]  # (weight, node, parent)
+    mst = []
+    total_cost = 0
+
+    while min_heap:
+        weight, node, parent = heapq.heappop(min_heap)
+        if node not in visited:
+            visited.add(node)
+            total_cost += weight
+            if parent is not None:
+                mst.append((parent, node, weight))
+            for neighbor, w in graph[node]:
+                if neighbor not in visited:
+                    heapq.heappush(min_heap, (w, neighbor, node))
+    return mst, total_cost
+
+# Kruskal Algorithm
+def find(parent, node):
+    if parent[node] != node:
+        parent[node] = find(parent, parent[node])
+    return parent[node]
+
+def union(parent, rank, u, v):
+    ru, rv = find(parent, u), find(parent, v)
+    if ru != rv:
+        if rank[ru] > rank[rv]:
+            parent[rv] = ru
+        elif rank[ru] < rank[rv]:
+            parent[ru] = rv
+        else:
+            parent[rv] = ru
+            rank[ru] += 1
+
+def kruskal(nodes, edges):
+    parent = {n: n for n in nodes}
+    rank = {n: 0 for n in nodes}
+
+    edges.sort(key=lambda x: x[2])
+    mst = []
+    total_cost = 0
+
+    for u, v, w in edges:
+        if find(parent, u) != find(parent, v):
+            union(parent, rank, u, v)
+            mst.append((u, v, w))
+            total_cost += w
+    return mst, total_cost
+n = int(input("Enter number of nodes: "))
+nodes = input("Enter node names: ").split()
+graph = {node: [] for node in nodes}
+edges = []
+e = int(input("Enter number of edges: "))
+print("Enter edges (u v weight):")
+for _ in range(e):
+    u, v, w = input().split()
+    w = int(w)
+    graph[u].append((v, w))
+    graph[v].append((u, w))
+    edges.append((u, v, w))
+start = input("Enter starting node (Prim): ")
+
+prim_mst, prim_cost = prim(graph, start)
+print("\nPrim's MST:", prim_mst)
+print("Total Cost:", prim_cost)
+
+kruskal_mst, kruskal_cost = kruskal(nodes, edges)
+print("\nKruskal's MST:", kruskal_mst)
+print("Total Cost:", kruskal_cost)
+
+'''A B 1
+A C 4
+B C 2
+B D 5
+C D 1'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8.
+import heapq
+# ---------------- DIJKSTRA ALGORITHM ----------------
+def dijkstra(graph, start):
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0
+    pq = [(0, start)]
+    while pq:
+        current_dist, node = heapq.heappop(pq)
+        for neighbor, weight in graph[node]:
+            distance = current_dist + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(pq, (distance, neighbor))
+    return distances
+
+# ---------------- KRUSKAL ALGORITHM ----------------
+def find(parent, node):
+    if parent[node] != node:
+        parent[node] = find(parent, parent[node])
+    return parent[node]
+
+def union(parent, rank, u, v):
+    ru, rv = find(parent, u), find(parent, v)
+    if ru != rv:
+        if rank[ru] > rank[rv]:
+            parent[rv] = ru
+        elif rank[ru] < rank[rv]:
+            parent[ru] = rv
+        else:
+            parent[rv] = ru
+            rank[ru] += 1
+
+def kruskal(nodes, edges):
+    parent = {n: n for n in nodes}
+    rank = {n: 0 for n in nodes}
+    edges.sort(key=lambda x: x[2])
+    mst = []
+    cost = 0
+
+    for u, v, w in edges:
+        if find(parent, u) != find(parent, v):
+            union(parent, rank, u, v)
+            mst.append((u, v, w))
+            cost += w
+    return mst, cost
+# ---------------- MAIN PROGRAM ----------------
+n = int(input("Enter number of nodes: "))
+nodes = input("Enter node names: ").split()
+graph = {node: [] for node in nodes}
+edges = []
+e = int(input("Enter number of edges: "))
+print("Enter edges (u v weight):")
+for _ in range(e):
+    u, v, w = input().split()
+    w = int(w)
+    graph[u].append((v, w))
+    graph[v].append((u, w))
+    edges.append((u, v, w))
+start = input("Enter source node for Dijkstra: ")
+
+# Dijkstra
+distances = dijkstra(graph, start)
+print("\nShortest Distance from", start)
+for node, dist in distances.items():
+    print(start, "->", node, "=", dist)
+
+# Kruskal
+mst, cost = kruskal(nodes, edges)
+print("\nKruskal MST Edges:")
+for u, v, w in mst:
+    print(u, "-", v, "=", w)
+print("Total Cost:", cost)
+
+'''A B 1
+A C 4
+B C 2
+B D 5
+C D 1'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9.
+def solve_n_queens(n):
+    # ---------- BACKTRACKING METHOD ----------
+    board1 = [[0]*n for _ in range(n)]
+    def is_safe(board, row, col):
+        # check column
+        for i in range(row):
+            if board[i][col] == 1:
+                return False
+
+        # check left diagonal
+        i, j = row-1, col-1
+        while i >= 0 and j >= 0:
+            if board[i][j] == 1:
+                return False
+            i -= 1
+            j -= 1
+        # check right diagonal
+        i, j = row-1, col+1
+        while i >= 0 and j < n:
+            if board[i][j] == 1:
+                return False
+            i -= 1
+            j += 1
+        return True
+
+    def backtracking(row):
+        if row == n:
+            return True
+        for col in range(n):
+            if is_safe(board1, row, col):
+                board1[row][col] = 1
+                if backtracking(row+1):
+                    return True
+                board1[row][col] = 0  # backtrack
+        return False
+
+    # ---------- BRANCH AND BOUND METHOD ----------
+    board2 = [[0]*n for _ in range(n)]
+    column = [False]*n
+    diag1 = [False]*(2*n-1)
+    diag2 = [False]*(2*n-1)
+    def branch_bound(row):
+        if row == n:
+            return True
+        for col in range(n):
+            if not column[col] and not diag1[row+col] and not diag2[row-col+n-1]:
+                board2[row][col] = 1
+                column[col] = True
+                diag1[row+col] = True
+                diag2[row-col+n-1] = True
+
+                if branch_bound(row+1):
+                    return True
+                board2[row][col] = 0
+                column[col] = False
+                diag1[row+col] = False
+                diag2[row-col+n-1] = False
+        return False
+
+    # ---------- RUN BOTH ----------
+    if backtracking(0):
+        print("\nBacktracking Solution:")
+        for r in board1:
+            print(r)
+    else:
+        print("No solution using Backtracking")
+    if branch_bound(0):
+        print("\nBranch and Bound Solution:")
+        for r in board2:
+            print(r)
+    else:
+        print("No solution using Branch and Bound")
+# ---- MAIN ----
+n = int(input("Enter number of queens: "))
+solve_n_queens(n)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10.
+import random
+from datetime import datetime
+greetings = ["hi", "hello", "hey"]
+
+greeting_responses = [
+    "Hello! Welcome to Smart Customer Support.",
+    "Hi! How may I help you today?",
+    "Welcome! Please choose a service."
+]
+
+refund_words = ["refund", "return", "money back"]
+chat_history = []
+def show_menu():
+    print("\n===== CUSTOMER SUPPORT MENU")
+    print("1. Order Status")
+    print("2. Payment Methods")
+    print("3. Delivery Information")
+    print("4. Refund / Return")
+    print("5. Current Time")
+    print("6. Chat History")
+    print("7. Help")
+    print("Type 'exit' to quit")
+
+def chatbot():
+    print("===== SMART CUSTOMER SUPPORT     CHATBOT =====")
+    print("Bot:", random.choice(greeting_responses))
+    show_menu()
+
+    while True:
+
+        user = input("\nYou: ").lower()
+        chat_history.append(user)
+        # EXIT
+        if user == "exit":
+            print("Bot: Thank you for visiting. Goodbye!")
+            break
+        elif any(word in user for word in greetings):
+            print("Bot:", random.choice(greeting_responses))
+        elif "1" in user or "order" in user
+            print("Bot: Your order is currently being processed.")
+
+        elif "2" in user or "payment" in user:
+            print("Bot: We accept UPI, Debit Card, Credit Card, and Net Banking.")    
+   
+        elif "3" in user or "delivery" in user:
+            print("Bot: Delivery usually takes 3 to 5 business days.")        
+
+        elif "4" in user or any(word in user for word in refund_words):
+            print("Bot: Refund will be processed within 7 working days.")
+
+        elif "5" in user or "time" in user:
+            current_time = datetime.now().strftime("%H:%M:%S")
+           print("Bot: Current Time is", current_time)
+
+        # HISTORY
+        elif "6" in user or "history" in user:
+            print("\n------ CHAT HISTORY ------")
+            for msg in chat_history:
+                print(msg)
+
+        # HELP
+        elif "7" in user or "help" in user:
+            show_menu()
+
+        else:
+            print("Bot: Sorry! Please select a valid option from the menu.")
+chatbot()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11.
+def hospital_expert_system():
+    print("Hospital Expert System")
+    print("Answer the following questions with yes or no.\n")
+
+    fever = input("Do you have fever? ").lower()
+    cough = input("Do you have cough? ").lower()
+    chest_pain = input("Do you have chest pain? ").lower()
+    headache = input("Do you have headache? ").lower()
+    stomach_pain = input("Do you have stomach pain? ").lower()
+    print("\nSuggested Department:")
+
+    if fever == "yes" and cough == "yes":
+        print("You should consult a General Physician.")
+    elif chest_pain == "yes":
+        print("You should consult a Cardiologist."
+    elif headache == "yes":
+        print("You should consult a Neurologist.")
+    elif stomach_pain == "yes":
+        print("You should consult a Gastroenterologist.")
+    else:
+        print("Please consult the General OPD for further diagnosis.")
+
+hospital_expert_system()
+
